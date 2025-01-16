@@ -1,296 +1,214 @@
 from kivy.app import App
-from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import StringProperty
-from kivy.clock import Clock
+from kivy.uix.image import Image
+from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.graphics import Rectangle, Ellipse
 from kivy.core.window import Window
-from kivy.uix.floatlayout import FloatLayout
-from random import randint
+from kivy.clock import Clock
+import random
+from kivy.core.audio import SoundLoader
 
-# หน้าจอเลือกตัวละคร
-class CharacterSelectScreen(Screen):
-    selected_ship = StringProperty("")
-
+# หน้าจอหลัก (Main Menu)
+class MainMenu(Screen):
     def __init__(self, **kwargs):
-        super(CharacterSelectScreen, self).__init__(**kwargs)
-
-        # เพิ่มพื้นหลัง
-        background = Image(
-            source=r'C:\Users\Asus\Desktop\รูป\5.jpg',
-            allow_stretch=True,
-            size_hint=(1.35, 1),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5}
-        )
+        super().__init__(**kwargs)
+        background = Image(source=r'C:\Users\Asus\Desktop\รูป\5.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        layout = BoxLayout(orientation='vertical', spacing=30, padding=(20, 20, 20, 20))
-
-        self.character_label = Label(
-            text="เลือกตัวละคร",
-            font_size=50,
-            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
-            size_hint=(1, 0.2),
-            halign="center",
-            valign="middle"
-        )
-        self.character_label.bind(size=self.character_label.setter('text_size'))
-        layout.add_widget(self.character_label)
-
-        grid_layout = GridLayout(cols=2, padding=10, spacing=20, size_hint=(1, 0.6))
-        self.ship_buttons = []
-
-        for i in range(1, 5):
-            button = Button(
-                text=f"ยานอวกาศ {i}",
-                font_size=30,
-                font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
-                size_hint=(None, None),
-                size=(450, 200)
-            )
-            button.bind(on_press=self.select_ship)
-            grid_layout.add_widget(button)
-            self.ship_buttons.append(button)
-
-        layout.add_widget(grid_layout)
-        self.add_widget(layout)
-
-    def select_ship(self, instance):
-        self.selected_ship = instance.text
-        print(f"เลือก: {self.selected_ship}")
-
-        self.manager.current = 'ship_image_screen'
-        ship_image_screen = self.manager.get_screen('ship_image_screen')
-        ship_image_screen.set_ship(self.selected_ship)
-
-
-# หน้าจอแสดงรูปยาน
-class ShipImageScreen(Screen):
-    selected_ship = StringProperty("")
-    ship_image = None
-
-    def __init__(self, **kwargs):
-        super(ShipImageScreen, self).__init__(**kwargs)
-
-        # เพิ่มพื้นหลัง
-        background = Image(
-            source=r'C:\Users\Asus\Desktop\รูป\5.jpg',
-            allow_stretch=True,
-            size_hint=(1.35, 1),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5}
-        )
-        self.add_widget(background)
-
-        layout = BoxLayout(orientation='vertical', spacing=30, padding=(20, 20, 20, 20))
-
-        self.ship_image = Image(size_hint=(None, None), size=(300, 300))
-        layout.add_widget(self.ship_image)
-
-        bottom_buttons_layout = BoxLayout(
-            orientation='horizontal', 
-            size_hint=(1, None), 
-            height=60,
-            padding=(20, 0)
-        )
-
-        back_button = Button(
-            text="ย้อนกลับ",
-            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
-            size_hint=(None, None),
-            size=(200, 50),
-            pos_hint={'x': 0, 'y': 0}
-        )
-        back_button.bind(on_press=self.go_back)
-        bottom_buttons_layout.add_widget(back_button)
-
-        start_button = Button(
-            text="เริ่มเกม",
-            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
-            size_hint=(None, None),
-            size=(200, 50),
-            pos_hint={'right': 1, 'y': 0}
-        )
+        start_button = Button(text="เริ่มเกม", size_hint=(None, None), size=(200, 50), font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                              pos_hint={'center_x': 0.5, 'center_y': 0.2})
         start_button.bind(on_press=self.start_game)
-        bottom_buttons_layout.add_widget(start_button)
+        self.add_widget(start_button)
 
-        layout.add_widget(bottom_buttons_layout)
-        self.add_widget(layout)
+    def start_game(self, instance):
+        self.manager.current = 'character_selection'
 
-    def set_ship(self, ship_name):
-        self.selected_ship = ship_name
-        self.update_ship_image()
 
-    def update_ship_image(self):
-        if self.selected_ship == "ยานอวกาศ 1":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\1.png'
-        elif self.selected_ship == "ยานอวกาศ 2":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\2.png'
-        elif self.selected_ship == "ยานอวกาศ 3":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\3.png'
-        elif self.selected_ship == "ยานอวกาศ 4":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\4.png'
+# หน้าจอเลือกตัวละคร (Character Selection)
+class CharacterSelection(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        background = Image(source=r'C:\Users\Asus\Desktop\รูป\6.jpg', allow_stretch=True, keep_ratio=False)
+        self.add_widget(background)
 
-        self.ship_image.pos_hint = {'center_x': 0.5, 'y': 0.1}
+        # ลิสต์ของเส้นทางรูปภาพของตัวละคร
+        self.character_images = [
+            r'C:\Users\Asus\Desktop\รูป\1.png',
+            r'C:\Users\Asus\Desktop\รูป\2.png',
+            r'C:\Users\Asus\Desktop\รูป\3.png',
+            r'C:\Users\Asus\Desktop\รูป\4.png'
+        ]
 
-    def go_back(self, instance):
-        self.manager.current = 'select'
+        # ปุ่มสำหรับเลือกตัวละคร 1-4
+        for i in range(4):
+            character_button = Button(text=f"ตัวละคร {i+1}", size_hint=(None, None), size=(200, 50), font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                                      pos_hint={'center_x': 0.5, 'center_y': 0.6 - i * 0.1})
+            character_button.bind(on_press=lambda instance, i=i: self.select_character(i))
+            self.add_widget(character_button)
+
+    def select_character(self, character_id):
+        # เก็บตัวละครที่เลือกในตัวจัดการหน้าจอ
+        self.manager.get_screen('game').selected_character = self.character_images[character_id]
+        self.manager.current = 'character_screen'
+
+
+# หน้าจอแสดงผลตัวละครที่เลือก (Character Screen)
+class CharacterScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        background = Image(source=r'C:\Users\Asus\Desktop\รูป\6.jpg', allow_stretch=True, keep_ratio=False)
+        self.add_widget(background)
+
+        self.character_image = Image(size_hint=(None, None), size=(200, 200),
+                                     pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        self.add_widget(self.character_image)
+
+        start_button = Button(text="เริ่ม", size_hint=(None, None), size=(150, 50),
+                              font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                              pos_hint={'x': 0.85, 'y': 0})
+        start_button.bind(on_press=self.start_game)
+        self.add_widget(start_button)
+
+        back_button = Button(text="ย้อนกลับ", size_hint=(None, None), size=(150, 50),
+                             font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                             pos_hint={'x': 0.05, 'y': 0})
+        back_button.bind(on_press=self.go_back)
+        self.add_widget(back_button)
+
+    def on_enter(self):
+        # ตั้งค่าภาพตัวละครเมื่อเข้าสู่หน้าจอ
+        self.character_image.source = self.manager.get_screen('game').selected_character
 
     def start_game(self, instance):
         self.manager.current = 'game'
-        game_screen = self.manager.get_screen('game')
-        game_screen.set_ship(self.selected_ship)
+
+    def go_back(self, instance):
+        self.manager.current = 'character_selection'
 
 
-# หน้าจอเกม
-class SpaceShooterGame(Screen):
-    selected_ship = StringProperty("")
-    ship_image = None
-    bullets = []
-    enemies = []
-    score = 0
-    score_label = None
-
+# หน้าจอเกม (Game Screen)
+class GameScreen(Screen):
     def __init__(self, **kwargs):
-        super(SpaceShooterGame, self).__init__(**kwargs)
-        self.ship_image = Image(size_hint=(None, None), size=(100, 100))
-        self.ship_image.pos_hint = {'center_x': 0.5, 'y': 0.1}
-        self.add_widget(self.ship_image)
+        super().__init__(**kwargs)
+        self.game_widget = GameWidget()
+        self.add_widget(self.game_widget)
 
-        # เพิ่มพื้นหลัง
-        background = Image(
-            source=r'C:\Users\Asus\Desktop\รูป\5.jpg',
-            allow_stretch=True,
-            size_hint=(1.35, 1),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5}
-        )
-        self.add_widget(background)
-        
-        self.score_label = Label(
-            text=f"คะแนน: {self.score}",
-            font_size=30,
-            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
-            size_hint=(None, None),
-            size=(200, 50),
-            pos_hint={'x': 0.5, 'top': 1}
-        )
-        self.add_widget(self.score_label)
+    def on_enter(self):
+        # อัปเดตรูปตัวละครเมื่อเข้าสู่หน้าจอเกม
+        self.game_widget.set_hero_image(self.selected_character)
+
+
+# เกม
+class GameWidget(Widget):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.sound = SoundLoader.load('test.mp3')
+        if self.sound:
+            self.sound.play()
+
+        self._keyboard = Window.request_keyboard(self._on_keyboard_closed, self)
+        self._keyboard.bind(on_key_down=self._on_key_down)
+        self._keyboard.bind(on_key_up=self._on_key_up)
+
+        self.pressed_keys = set()
+
+        with self.canvas:
+            self.hero = Rectangle(pos=(Window.width / 2, 50), size=(100, 100))
+            self.bullets = []
+            self.asteroids = []
+
+        self.hero_speed = 200
+        self.bullet_speed = 10
+        self.asteroid_speed = 5
 
         Clock.schedule_interval(self.update, 1.0 / 60.0)
-        Clock.schedule_interval(self.spawn_enemy, 2.0)
+        Clock.schedule_interval(self.create_asteroid, 1.0)
 
-        Window.bind(on_key_down=self.on_key_down)
-        Window.bind(on_key_up=self.on_key_up)
+    def set_hero_image(self, image_path):
+        self.hero.source = image_path
 
-        # เพิ่มการจับการลากของเมาส์
-        self.bind(on_touch_move=self.on_touch_move)
+    def _on_keyboard_closed(self):
+        self._keyboard.unbind(on_key_down=self._on_key_down)
+        self._keyboard.unbind(on_key_up=self._on_key_up)
+        self._keyboard = None
 
-    def set_ship(self, ship_name):
-        self.selected_ship = ship_name
-        self.update_ship_image()
+    def _on_key_down(self, keyboard, keycode, text, modifiers):
+        print('down', text)
+        self.pressed_keys.add(text)
 
-    def update_ship_image(self):
-        if self.selected_ship == "ยานอวกาศ 1":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\1.png'
-        elif self.selected_ship == "ยานอวกาศ 2":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\2.png'
-        elif self.selected_ship == "ยานอวกาศ 3":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\3.png'
-        elif self.selected_ship == "ยานอวกาศ 4":
-            self.ship_image.source = r'C:\Users\Asus\Desktop\รูป\4.png'
+    def _on_key_up(self, keyboard, keycode):
+        text = keycode[1]
+        print('up', text)
+        if text in self.pressed_keys:
+            self.pressed_keys.remove(text)
 
-        self.ship_image.pos_hint = {'center_x': 0.5, 'y': 0.1}  # ยานอยู่ที่ตำแหน่งเริ่มต้น
+    def move_step(self, dt):
+        cur_x, cur_y = self.hero.pos
+        step = self.hero_speed * dt
 
-    def on_touch_move(self, instance, touch):
-        # เคลื่อนยานให้ตามตำแหน่งเมาส์
-        self.ship_image.center = touch.pos
+        if 'a' in self.pressed_keys:
+            cur_x -= step
+        if 'd' in self.pressed_keys:
+            cur_x += step
 
-    def on_key_down(self, instance, keyboard, keycode, scancode, modifiers):
-        if keycode == 97:  # A
-            self.velocity_x = -10
-        elif keycode == 100:  # D
-            self.velocity_x = 10
-        elif keycode == 119:  # W
-            self.velocity_y = 10
-        elif keycode == 115:  # S
-            self.velocity_y = -10
-        elif keycode == 32:  # Space (ยิงกระสุน)
-            self.fire_bullet()
+        cur_x = max(0, min(cur_x, Window.width - self.hero.size[0]))
+        cur_y = max(0, min(cur_y, Window.height - self.hero.size[1]))
 
-    def on_key_up(self, instance, keyboard, keycode):
-        if keycode == 97 or keycode == 100:
-            self.velocity_x = 0
-        elif keycode == 119 or keycode == 115:
-            self.velocity_y = 0
+        self.hero.pos = (cur_x, cur_y)
+
+    def shoot_bullet(self):
+        with self.canvas:
+            bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, self.hero.pos[1] + self.hero.size[1]), size=(10, 20))
+            self.bullets.append(bullet)
+
+    def create_asteroid(self, dt):
+        with self.canvas:
+            x_pos = random.randint(0, Window.width - 50)
+            asteroid = Ellipse(pos=(x_pos, Window.height), size=(50, 50))
+            self.asteroids.append(asteroid)
 
     def update(self, dt):
-        self.update_bullets()
-        self.update_enemies()
+        self.move_step(dt)
 
-    def spawn_enemy(self, dt):
-        enemy = Image(
-            source=r'C:\Users\Asus\Desktop\รูป\enemy.png',
-            size_hint=(None, None),
-            size=(50, 50)
-        )
-        enemy.pos = (randint(0, Window.width-50), Window.height)
-        self.add_widget(enemy)
-        self.enemies.append(enemy)
-
-    def update_bullets(self):
         for bullet in self.bullets:
-            bullet.y += 10
-            if bullet.top > Window.height:
-                self.remove_widget(bullet)
+            bullet.pos = (bullet.pos[0], bullet.pos[1] + self.bullet_speed)
+            if bullet.pos[1] > Window.height:
+                self.canvas.remove(bullet)
                 self.bullets.remove(bullet)
 
-    def update_enemies(self):
-        for enemy in self.enemies:
-            enemy.y -= 5
-            if enemy.collide_widget(self.ship_image):  # ตรวจสอบชนกับยาน
-                print("Game Over!")
-                self.manager.current = 'select'
-                return
+        for asteroid in self.asteroids:
+            asteroid.pos = (asteroid.pos[0], asteroid.pos[1] - self.asteroid_speed)
+            if asteroid.pos[1] < 0:
+                self.canvas.remove(asteroid)
+                self.asteroids.remove(asteroid)
 
-            for bullet in self.bullets:
-                if bullet.collide_widget(enemy):  # ตรวจสอบชนระหว่างกระสุนและศัตรู
-                    self.update_score(10)  # เพิ่มคะแนนเมื่อชน
-                    self.remove_widget(bullet)
-                    self.remove_widget(enemy)
+        self.check_collisions()
+
+    def check_collisions(self):
+        for bullet in self.bullets:
+            for asteroid in self.asteroids:
+                if bullet.collide_widget(asteroid):
+                    self.canvas.remove(bullet)
+                    self.canvas.remove(asteroid)
                     self.bullets.remove(bullet)
-                    self.enemies.remove(enemy)
-                    break  # ออกจากลูปเมื่อเจอการชน
-            if enemy.y + enemy.height < 0:  # ถ้าศัตรูหลุดออกจากหน้าจอ
-                self.remove_widget(enemy)
-                self.enemies.remove(enemy)
-
-    def fire_bullet(self):
-        bullet = Image(
-            source=r'C:\Users\Asus\Desktop\รูป\bullet.png',
-            size_hint=(None, None),
-            size=(10, 30)
-        )
-        bullet.pos = (self.ship_image.center_x - 5, self.ship_image.top)
-        self.add_widget(bullet)
-        self.bullets.append(bullet)
-
-    def update_score(self, points):
-        self.score += points
-        self.score_label.text = f"คะแนน: {self.score}"
+                    self.asteroids.remove(asteroid)
+                    return
 
 
-# แอปหลัก
-class SpaceShooterApp(App):
+# จัดการหน้าจอทั้งหมด (Screen Manager)
+class MyApp(App):
     def build(self):
-        screen_manager = ScreenManager()
-        screen_manager.add_widget(CharacterSelectScreen(name='select'))
-        screen_manager.add_widget(ShipImageScreen(name='ship_image_screen'))
-        screen_manager.add_widget(SpaceShooterGame(name='game'))
-        return screen_manager
+        sm = ScreenManager()
+
+        sm.add_widget(MainMenu(name='main_menu'))
+        sm.add_widget(CharacterSelection(name='character_selection'))
+        sm.add_widget(CharacterScreen(name='character_screen'))
+        sm.add_widget(GameScreen(name='game'))
+
+        return sm
 
 
 if __name__ == '__main__':
-    SpaceShooterApp().run()
+    app = MyApp()
+    app.run()
