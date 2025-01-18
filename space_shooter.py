@@ -3,11 +3,13 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen, ScreenManager
-from kivy.graphics import Rectangle, Ellipse
+from kivy.graphics import Rectangle, Ellipse, Color
 from kivy.core.window import Window
 from kivy.clock import Clock
 import random
 from kivy.core.audio import SoundLoader
+from kivy.uix.label import Label
+
 
 # หน้าจอหลัก (Main Menu)
 class MainMenu(Screen):
@@ -122,6 +124,9 @@ class GameWidget(Widget):
         self.bullet_speed = 10
         self.asteroid_speed = 2
 
+        self.game_over = False
+        self.game_over_label = None
+
         Clock.schedule_interval(self.update, 1.0 / 60.0)
         Clock.schedule_interval(self.create_asteroid, 1.0)
 
@@ -135,11 +140,9 @@ class GameWidget(Widget):
 
     def _on_key_down(self, keyboard, keycode, text, modifiers):
         print('down', text)
-        self.pressed_keys.add(text)
-
-        # ตรวจจับการกดปุ่ม 'i' เพื่อปล่อยกระสุน
-        if text == 'i':
+        if text == 'i' and not self.game_over:
             self.shoot_bullet()
+        self.pressed_keys.add(text)
 
     def _on_key_up(self, keyboard, keycode):
         text = keycode[1]
@@ -163,8 +166,8 @@ class GameWidget(Widget):
 
     def shoot_bullet(self):
         with self.canvas:
-            bullet_image = Image(source=r'C:\Users\Asus\Desktop\รูป\8.png', size=(50, 50))
-            bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, self.hero.pos[1] + self.hero.size[1]), size=(20, 30), texture=bullet_image.texture)
+            bullet_image = Image(source=r'C:\Users\Asus\Desktop\รูป\8.png', size=(10, 20))
+            bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, self.hero.pos[1] + self.hero.size[1]), size=(10, 20), texture=bullet_image.texture)
             self.bullets.append(bullet)
 
     def create_asteroid(self, dt):
@@ -175,6 +178,9 @@ class GameWidget(Widget):
             self.asteroids.append(asteroid)
 
     def update(self, dt):
+        if self.game_over:
+            return
+
         self.move_step(dt)
 
         for bullet in self.bullets:
@@ -194,43 +200,49 @@ class GameWidget(Widget):
     def check_collisions(self):
         for bullet in self.bullets:
             for asteroid in self.asteroids:
-                if self.collide(bullet, asteroid):
+                if self.check_collision(bullet, asteroid):
                     self.canvas.remove(bullet)
                     self.canvas.remove(asteroid)
                     self.bullets.remove(bullet)
                     self.asteroids.remove(asteroid)
-                    return
 
-    def collide(self, bullet, asteroid):
-        # คำนวณการชนกันระหว่าง Rectangle (กระสุน) และ Ellipse (ดาวเคราะห์)
-        bullet_x, bullet_y = bullet.pos
-        bullet_width, bullet_height = bullet.size
+        for asteroid in self.asteroids:
+            if self.check_asteroid_collision(asteroid):
+                self.game_over = True
+                self.show_game_over()
 
-        asteroid_x, asteroid_y = asteroid.pos
-        asteroid_width, asteroid_height = asteroid.size
+    def check_collision(self, bullet, asteroid):
+        # ตรวจสอบการชนกันระหว่างกระสุนและดาวเคราะห์
+        bullet_center = (bullet.pos[0] + bullet.size[0] / 2, bullet.pos[1] + bullet.size[1] / 2)
+        asteroid_center = (asteroid.pos[0] + asteroid.size[0] / 2, asteroid.pos[1] + asteroid.size[1] / 2)
+        
+        # คำนวณระยะห่างระหว่างศูนย์กลางของ Bullet และ Asteroid
+        distance = ((bullet_center[0] - asteroid_center[0]) ** 2 + (bullet_center[1] - asteroid_center[1]) ** 2) ** 0.5
+        return distance < (bullet.size[0] / 2 + asteroid.size[0] / 2)
 
-        # ตรวจสอบการชนกัน
-        if (bullet_x < asteroid_x + asteroid_width and
-            bullet_x + bullet_width > asteroid_x and
-            bullet_y < asteroid_y + asteroid_height and
-            bullet_y + bullet_height > asteroid_y):
-            return True
-        return False
+    def check_asteroid_collision(self, asteroid):
+        # ตรวจสอบการชนกันระหว่าง Hero และ Asteroid
+        hero_center = (self.hero.pos[0] + self.hero.size[0] / 2, self.hero.pos[1] + self.hero.size[1] / 2)
+        asteroid_center = (asteroid.pos[0] + asteroid.size[0] / 2, asteroid.pos[1] + asteroid.size[1] / 2)
+        
+        # คำนวณระยะห่างระหว่างศูนย์กลางของ Hero และ Asteroid
+        distance = ((hero_center[0] - asteroid_center[0]) ** 2 + (hero_center[1] - asteroid_center[1]) ** 2) ** 0.5
+        return distance < (self.hero.size[0] / 2 + asteroid.size[0] / 2)
 
+    def show_game_over(self):
+        if not self.game_over_label:
+            self.game_over_label = Label(text="Game Over!", font_size=50, color=(1, 0, 0, 1),
+                                         size_hint=(None, None), size=(400, 100), pos_hint={'center_x': 5, 'center_y': 5})
+            self.add_widget(self.game_over_label)
 
-# จัดการหน้าจอทั้งหมด (Screen Manager)
-class MyApp(App):
+class SpaceShooterApp(App):
     def build(self):
         sm = ScreenManager()
-
-        sm.add_widget(MainMenu(name='main_menu'))
-        sm.add_widget(CharacterSelection(name='character_selection'))
-        sm.add_widget(CharacterScreen(name='character_screen'))
-        sm.add_widget(GameScreen(name='game'))
-
+        sm.add_widget(MainMenu(name="main_menu"))
+        sm.add_widget(CharacterSelection(name="character_selection"))
+        sm.add_widget(CharacterScreen(name="character_screen"))
+        sm.add_widget(GameScreen(name="game"))
         return sm
 
-
 if __name__ == '__main__':
-    app = MyApp()
-    app.run()
+    SpaceShooterApp().run()
