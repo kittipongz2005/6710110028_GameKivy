@@ -10,12 +10,10 @@ import random
 from kivy.core.audio import SoundLoader
 from kivy.uix.label import Label
 
-
-# หน้าจอหลัก (Main Menu)
 class MainMenu(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source=r'C:\Users\Asus\Desktop\รูป\5.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/5.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
         start_button = Button(text="เริ่มเกม", size_hint=(None, None), size=(200, 50), font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
@@ -26,23 +24,23 @@ class MainMenu(Screen):
     def start_game(self, instance):
         self.manager.current = 'character_selection'
 
-
-# หน้าจอเลือกตัวละคร (Character Selection)
 class CharacterSelection(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source=r'C:\Users\Asus\Desktop\รูป\6.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        # ลิสต์ของเส้นทางรูปภาพของตัวละคร
+        title_label = Label(text="เลือกตัวละคร", font_size=50, font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                            size_hint=(None, None), size=(300, 100), pos_hint={'center_x': 0.5, 'top': 1})
+        self.add_widget(title_label)
+
         self.character_images = [
-            r'C:\Users\Asus\Desktop\รูป\1.png',
-            r'C:\Users\Asus\Desktop\รูป\2.png',
-            r'C:\Users\Asus\Desktop\รูป\3.png',
-            r'C:\Users\Asus\Desktop\รูป\4.png'
+            'C:/Users/Asus/Desktop/รูป/1.png',
+            'C:/Users/Asus/Desktop/รูป/2.png',
+            'C:/Users/Asus/Desktop/รูป/3.png',
+            'C:/Users/Asus/Desktop/รูป/4.png'
         ]
 
-        # ปุ่มสำหรับเลือกตัวละคร 1-4
         for i in range(4):
             character_button = Button(text=f"ตัวละคร {i+1}", size_hint=(None, None), size=(200, 50), font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                                       pos_hint={'center_x': 0.5, 'center_y': 0.6 - i * 0.1})
@@ -50,20 +48,16 @@ class CharacterSelection(Screen):
             self.add_widget(character_button)
 
     def select_character(self, character_id):
-        # เก็บตัวละครที่เลือกในตัวจัดการหน้าจอ
         self.manager.get_screen('game').selected_character = self.character_images[character_id]
         self.manager.current = 'character_screen'
 
-
-# หน้าจอแสดงผลตัวละครที่เลือก (Character Screen)
 class CharacterScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source=r'C:\Users\Asus\Desktop\รูป\6.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        self.character_image = Image(size_hint=(None, None), size=(200, 200),
-                                     pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        self.character_image = Image(size_hint=(None, None), size=(200, 200), pos_hint={'center_x': 0.5, 'center_y': 0.6})
         self.add_widget(self.character_image)
 
         start_button = Button(text="เริ่ม", size_hint=(None, None), size=(150, 50),
@@ -79,7 +73,6 @@ class CharacterScreen(Screen):
         self.add_widget(back_button)
 
     def on_enter(self):
-        # ตั้งค่าภาพตัวละครเมื่อเข้าสู่หน้าจอ
         self.character_image.source = self.manager.get_screen('game').selected_character
 
     def start_game(self, instance):
@@ -88,20 +81,72 @@ class CharacterScreen(Screen):
     def go_back(self, instance):
         self.manager.current = 'character_selection'
 
+class GameOverScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
+        self.add_widget(background)
 
-# หน้าจอเกม (Game Screen)
+        game_over_label = Label(text="Game Over!", font_size=50, color=(1, 0, 0, 1),
+                                font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                                size_hint=(None, None), size=(400, 100), pos_hint={'center_x': 0.5, 'center_y': 0.7})
+        self.add_widget(game_over_label)
+
+        back_button = Button(text="กลับ", size_hint=(None, None), size=(150, 50),
+                             font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                             pos_hint={'center_x': 0.3, 'center_y': 0.3})
+        back_button.bind(on_press=self.go_back)
+        self.add_widget(back_button)
+
+        retry_button = Button(text="เล่นอีกครั้ง", size_hint=(None, None), size=(150, 50),
+                              font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                              pos_hint={'center_x': 0.7, 'center_y': 0.3})
+        retry_button.bind(on_press=self.retry_game)
+        self.add_widget(retry_button)
+
+    def go_back(self, instance):
+        # เมื่อกด "กลับ" ให้กลับไปที่หน้าเลือกตัวละคร
+        self.manager.current = 'character_selection'
+
+    def retry_game(self, instance):
+        # รีเซ็ตเกม
+        self.manager.get_screen('game').reset_game()
+
+        # รีเซ็ตตัวละคร
+        self.manager.get_screen('game').set_hero_image(self.manager.get_screen('game').selected_character)
+
+        # กลับไปที่หน้าเล่นเกม
+        self.manager.current = 'game'
+
+
 class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/12.jpg', allow_stretch=True, keep_ratio=False)
+        self.add_widget(background)
         self.game_widget = GameWidget()
         self.add_widget(self.game_widget)
 
+
     def on_enter(self):
-        # อัปเดตรูปตัวละครเมื่อเข้าสู่หน้าจอเกม
         self.game_widget.set_hero_image(self.selected_character)
+        Clock.schedule_once(self.start_asteroids, 1.0)
 
+    def start_asteroids(self, dt):
+        self.game_widget.start_asteroid_creation()
 
-# เกม
+    def on_leave(self):
+        self.game_widget.reset_game()
+
+    def set_hero_image(self, image_path):
+        self.game_widget.set_hero_image(image_path)
+
+    
+    def reset_game(self):
+        self.game_widget.reset_game()
+
+       
+        
 class GameWidget(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -125,13 +170,15 @@ class GameWidget(Widget):
         self.asteroid_speed = 2
 
         self.game_over = False
-        self.game_over_label = None
 
         Clock.schedule_interval(self.update, 1.0 / 60.0)
-        Clock.schedule_interval(self.create_asteroid, 1.0)
 
     def set_hero_image(self, image_path):
-        self.hero.source = image_path
+        hero_image = Image(source=image_path).texture
+        self.hero.texture = hero_image
+
+    def start_asteroid_creation(self):
+        Clock.schedule_interval(self.create_asteroid, 1.0)
 
     def _on_keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_key_down)
@@ -139,14 +186,12 @@ class GameWidget(Widget):
         self._keyboard = None
 
     def _on_key_down(self, keyboard, keycode, text, modifiers):
-        print('down', text)
         if text == 'i' and not self.game_over:
             self.shoot_bullet()
         self.pressed_keys.add(text)
 
     def _on_key_up(self, keyboard, keycode):
         text = keycode[1]
-        print('up', text)
         if text in self.pressed_keys:
             self.pressed_keys.remove(text)
 
@@ -166,14 +211,14 @@ class GameWidget(Widget):
 
     def shoot_bullet(self):
         with self.canvas:
-            bullet_image = Image(source=r'C:\Users\Asus\Desktop\รูป\8.png', size=(10, 20))
+            bullet_image = Image(source='C:/Users/Asus/Desktop/รูป/8.png', size=(10, 20))
             bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, self.hero.pos[1] + self.hero.size[1]), size=(10, 20), texture=bullet_image.texture)
             self.bullets.append(bullet)
 
     def create_asteroid(self, dt):
         with self.canvas:
             x_pos = random.randint(0, Window.width - 50)
-            asteroid_image = Image(source=r'C:\Users\Asus\Desktop\รูป\9.png', size=(50, 50))
+            asteroid_image = Image(source='C:/Users/Asus/Desktop/รูป/9.png', size=(50, 50))
             asteroid = Ellipse(pos=(x_pos, Window.height), size=(50, 50), texture=asteroid_image.texture)
             self.asteroids.append(asteroid)
 
@@ -208,41 +253,42 @@ class GameWidget(Widget):
 
         for asteroid in self.asteroids:
             if self.check_asteroid_collision(asteroid):
-                self.game_over = True
                 self.show_game_over()
 
     def check_collision(self, bullet, asteroid):
-        # ตรวจสอบการชนกันระหว่างกระสุนและดาวเคราะห์
         bullet_center = (bullet.pos[0] + bullet.size[0] / 2, bullet.pos[1] + bullet.size[1] / 2)
         asteroid_center = (asteroid.pos[0] + asteroid.size[0] / 2, asteroid.pos[1] + asteroid.size[1] / 2)
-        
-        # คำนวณระยะห่างระหว่างศูนย์กลางของ Bullet และ Asteroid
         distance = ((bullet_center[0] - asteroid_center[0]) ** 2 + (bullet_center[1] - asteroid_center[1]) ** 2) ** 0.5
         return distance < (bullet.size[0] / 2 + asteroid.size[0] / 2)
 
     def check_asteroid_collision(self, asteroid):
-        # ตรวจสอบการชนกันระหว่าง Hero และ Asteroid
         hero_center = (self.hero.pos[0] + self.hero.size[0] / 2, self.hero.pos[1] + self.hero.size[1] / 2)
         asteroid_center = (asteroid.pos[0] + asteroid.size[0] / 2, asteroid.pos[1] + asteroid.size[1] / 2)
-        
-        # คำนวณระยะห่างระหว่างศูนย์กลางของ Hero และ Asteroid
         distance = ((hero_center[0] - asteroid_center[0]) ** 2 + (hero_center[1] - asteroid_center[1]) ** 2) ** 0.5
         return distance < (self.hero.size[0] / 2 + asteroid.size[0] / 2)
 
     def show_game_over(self):
-        if not self.game_over_label:
-            self.game_over_label = Label(text="Game Over!", font_size=50, color=(1, 0, 0, 1),
-                                         size_hint=(None, None), size=(400, 100), pos_hint={'center_x': 5, 'center_y': 5})
-            self.add_widget(self.game_over_label)
+        self.game_over = True
+        self.parent.manager.current = 'game_over'
 
-class SpaceShooterApp(App):
+    def reset_game(self):
+        self.game_over = False
+        self.bullets.clear()
+        self.asteroids.clear()
+        self.hero.pos = (Window.width / 2, 50)
+
+
+
+class MyApp(App):
     def build(self):
         sm = ScreenManager()
-        sm.add_widget(MainMenu(name="main_menu"))
-        sm.add_widget(CharacterSelection(name="character_selection"))
-        sm.add_widget(CharacterScreen(name="character_screen"))
-        sm.add_widget(GameScreen(name="game"))
+        sm.add_widget(MainMenu(name='main_menu'))
+        sm.add_widget(CharacterSelection(name='character_selection'))
+        sm.add_widget(CharacterScreen(name='character_screen'))
+        sm.add_widget(GameScreen(name='game'))
+        sm.add_widget(GameOverScreen(name='game_over'))
         return sm
 
 if __name__ == '__main__':
-    SpaceShooterApp().run()
+    MyApp().run()
+
