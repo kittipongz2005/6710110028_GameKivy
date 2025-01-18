@@ -32,7 +32,6 @@ class CharacterSelection(Screen):
         background = Image(source=r'C:\Users\Asus\Desktop\รูป\6.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        # ลิสต์ของเส้นทางรูปภาพของตัวละคร
         self.character_images = [
             r'C:\Users\Asus\Desktop\รูป\1.png',
             r'C:\Users\Asus\Desktop\รูป\2.png',
@@ -40,7 +39,6 @@ class CharacterSelection(Screen):
             r'C:\Users\Asus\Desktop\รูป\4.png'
         ]
 
-        # ปุ่มสำหรับเลือกตัวละคร 1-4
         for i in range(4):
             character_button = Button(text=f"ตัวละคร {i+1}", size_hint=(None, None), size=(200, 50), font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                                       pos_hint={'center_x': 0.5, 'center_y': 0.6 - i * 0.1})
@@ -48,7 +46,6 @@ class CharacterSelection(Screen):
             self.add_widget(character_button)
 
     def select_character(self, character_id):
-        # เก็บตัวละครที่เลือกในตัวจัดการหน้าจอ
         self.manager.get_screen('game').selected_character = self.character_images[character_id]
         self.manager.current = 'character_screen'
 
@@ -77,7 +74,6 @@ class CharacterScreen(Screen):
         self.add_widget(back_button)
 
     def on_enter(self):
-        # ตั้งค่าภาพตัวละครเมื่อเข้าสู่หน้าจอ
         self.character_image.source = self.manager.get_screen('game').selected_character
 
     def start_game(self, instance):
@@ -95,7 +91,6 @@ class GameScreen(Screen):
         self.add_widget(self.game_widget)
 
     def on_enter(self):
-        # อัปเดตรูปตัวละครเมื่อเข้าสู่หน้าจอเกม
         self.game_widget.set_hero_image(self.selected_character)
 
 
@@ -118,12 +113,13 @@ class GameWidget(Widget):
             self.bullets = []
             self.asteroids = []
 
-        self.hero_speed = 200
+        self.hero_speed = 500
         self.bullet_speed = 10
-        self.asteroid_speed = 5
+        self.asteroid_speed = 2
+        self.asteroid_spawn_interval = 2.0  # เริ่มต้นที่ 2 วินาที
+        self.asteroid_timer = 0.0
 
         Clock.schedule_interval(self.update, 1.0 / 60.0)
-        Clock.schedule_interval(self.create_asteroid, 1.0)
 
     def set_hero_image(self, image_path):
         self.hero.source = image_path
@@ -134,12 +130,10 @@ class GameWidget(Widget):
         self._keyboard = None
 
     def _on_key_down(self, keyboard, keycode, text, modifiers):
-        print('down', text)
         self.pressed_keys.add(text)
 
     def _on_key_up(self, keyboard, keycode):
         text = keycode[1]
-        print('up', text)
         if text in self.pressed_keys:
             self.pressed_keys.remove(text)
 
@@ -162,14 +156,21 @@ class GameWidget(Widget):
             bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, self.hero.pos[1] + self.hero.size[1]), size=(10, 20))
             self.bullets.append(bullet)
 
-    def create_asteroid(self, dt):
+    def create_asteroid(self):
         with self.canvas:
             x_pos = random.randint(0, Window.width - 50)
-            asteroid = Ellipse(pos=(x_pos, Window.height), size=(50, 50))
+            asteroid_image = Image(source=r'C:\Users\Asus\Desktop\รูป\9.png', size=(50, 50))
+            asteroid = Ellipse(pos=(x_pos, Window.height), size=(50, 50), texture=asteroid_image.texture)
             self.asteroids.append(asteroid)
 
     def update(self, dt):
         self.move_step(dt)
+        self.asteroid_timer += dt
+
+        if self.asteroid_timer >= self.asteroid_spawn_interval:
+            self.create_asteroid()
+            self.asteroid_timer = 0
+            self.asteroid_spawn_interval = max(0.5, self.asteroid_spawn_interval - 0.05)
 
         for bullet in self.bullets:
             bullet.pos = (bullet.pos[0], bullet.pos[1] + self.bullet_speed)
@@ -196,16 +197,13 @@ class GameWidget(Widget):
                     return
 
 
-# จัดการหน้าจอทั้งหมด (Screen Manager)
 class MyApp(App):
     def build(self):
         sm = ScreenManager()
-
         sm.add_widget(MainMenu(name='main_menu'))
         sm.add_widget(CharacterSelection(name='character_selection'))
         sm.add_widget(CharacterScreen(name='character_screen'))
         sm.add_widget(GameScreen(name='game'))
-
         return sm
 
 
