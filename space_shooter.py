@@ -15,6 +15,11 @@ class MainMenu(Screen):
         super().__init__(**kwargs)
         background = Image(source='C:/Users/Asus/Desktop/รูป/5.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
+        game_title = Label(text="Space Adventure Game", font_size=100, color=(1, 1, 0, 1), 
+                        font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+                        size_hint=(None, None), size=(600, 150), 
+                        pos_hint={'center_x': 0.5, 'center_y': 0.7})  # ปรับค่า center_y ลงมา
+        self.add_widget(game_title)
 
         start_button = Button(text="เริ่มเกม", size_hint=(None, None), size=(200, 50), 
                           font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
@@ -98,7 +103,7 @@ class GameOverScreen(Screen):
                                  pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.add_widget(self.game_over_label)
 
-        # เพิ่มปุ่มเล่นใหม่
+
         retry_button = Button(text="เล่นใหม่", size_hint=(None, None), size=(200, 50),
                           font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                           pos_hint={'center_x': 0.5, 'center_y': 0.4})
@@ -111,7 +116,7 @@ class GameOverScreen(Screen):
         quit_button.bind(on_press=self.quit_game)
         self.add_widget(quit_button)
 
-        # เพิ่ม Label สำหรับแสดงคะแนน
+
         self.score_label = Label(text="", font_size=30, 
                              font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                              size_hint=(None, None), size=(400, 100), 
@@ -119,7 +124,7 @@ class GameOverScreen(Screen):
         self.add_widget(self.score_label)
 
     def on_enter(self):
-        # อัพเดทคะแนนเมื่อเข้าสู่หน้า Game Over
+
         game_screen = self.manager.get_screen('game')
         self.score_label.text = f"คะแนนของคุณ: {game_screen.game_widget.score}\nคะแนนสูงสุด: {game_screen.game_widget.high_score}"
 
@@ -158,12 +163,11 @@ class GameScreen(Screen):
 class GameWidget(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # เพิ่มตัวแปรสำหรับระบบคะแนนและเลเวล
+  
         self.score = 0
         self.level = 1
         self.high_score = self.load_high_score()
         
-        # เพิ่ม Label สำหรับแสดงผล
         self.score_label = Label(
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
             pos=(10, Window.height - 100),
@@ -187,7 +191,6 @@ class GameWidget(Widget):
             self.bullets = []
             self.asteroids = []
 
-        # ปรับค่าความเร็วตามเลเวล
         self.base_hero_speed = 500
         self.base_bullet_speed = 10
         self.base_asteroid_speed = 2
@@ -197,7 +200,7 @@ class GameWidget(Widget):
         Clock.schedule_interval(self.update, 1.0 / 60.0)
 
     def update_speeds(self):
-        # ปรับความเร็วตามเลเวล
+
         self.hero_speed = self.base_hero_speed + (self.level * 20)
         self.bullet_speed = self.base_bullet_speed + (self.level * 1)
         self.asteroid_speed = self.base_asteroid_speed + (self.level * 0.5)
@@ -261,7 +264,7 @@ class GameWidget(Widget):
         with self.canvas:
             x_pos = random.randint(0, Window.width - 50)
             y_pos = Window.height
-            asteroid_image = Image(source='C:/Users/Asus/Desktop/รูป/7.png', size=(50, 50))
+            asteroid_image = Image(source='C:/Users/Asus/Desktop/รูป/9.png', size=(50, 50))
             asteroid = Rectangle(pos=(x_pos, y_pos), size=(50, 50), texture=asteroid_image.texture)
             self.asteroids.append(asteroid)
 
@@ -269,24 +272,21 @@ class GameWidget(Widget):
         if self.game_over:
             return
 
-        # เคลื่อนที่ตัวละคร
         self.move_step(dt)
 
-        # เคลื่อนที่กระสุน
+     
         for bullet in self.bullets:
             bullet.pos = (bullet.pos[0], bullet.pos[1] + self.bullet_speed)
             if bullet.pos[1] > Window.height:
                 self.canvas.remove(bullet)
                 self.bullets.remove(bullet)
 
-        # เคลื่อนที่อุกกาบาต
         for asteroid in self.asteroids:
             asteroid.pos = (asteroid.pos[0], asteroid.pos[1] - self.asteroid_speed)
             if asteroid.pos[1] < 0:
                 self.canvas.remove(asteroid)
                 self.asteroids.remove(asteroid)
 
-        # ตรวจจับการชนระหว่างกระสุนและอุกกาบาต
         for bullet in self.bullets:
             for asteroid in self.asteroids:
                 if self.check_collision(bullet, asteroid):
@@ -301,14 +301,13 @@ class GameWidget(Widget):
                     self.update_score_label()
                     break
 
-        # ตรวจจับการชนระหว่างตัวละครและอุกกาบาต
+
         for asteroid in self.asteroids:
             if self.check_collision(self.hero, asteroid):
                 self.game_over = True
                 self.manager.current = 'game_over'
                 break
 
-        # เพิ่มเลเวลเมื่อคะแนนถึงเกณฑ์
         if self.score // 100 + 1 > self.level:
             self.level += 1
             self.update_speeds()
