@@ -170,10 +170,12 @@ class GameWidget(Widget):
         
         self.score_label = Label(
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
-            pos=(10, Window.height - 100),
+            pos=(20, Window.height - 100),
             size_hint=(None, None),
+            font_size=30,  # ปรับขนาดให้ใหญ่ขึ้น
             font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf"
         )
+
         self.add_widget(self.score_label)
 
         self.sound = SoundLoader.load('test.mp3')
@@ -201,8 +203,8 @@ class GameWidget(Widget):
 
     def update_speeds(self):
 
-        self.hero_speed = self.base_hero_speed + (self.level * 20)
-        self.bullet_speed = self.base_bullet_speed + (self.level * 1)
+        self.hero_speed = self.base_hero_speed + (self.level)
+        self.bullet_speed = self.base_bullet_speed + (self.level)
         self.asteroid_speed = self.base_asteroid_speed + (self.level * 0.5)
 
     def load_high_score(self):
@@ -294,7 +296,7 @@ class GameWidget(Widget):
                     self.canvas.remove(asteroid)
                     self.bullets.remove(bullet)
                     self.asteroids.remove(asteroid)
-                    self.score += 10
+                    self.score += 1
                     if self.score > self.high_score:
                         self.high_score = self.score
                         self.save_high_score()
@@ -345,8 +347,9 @@ class MyGameApp(App):
         sm.add_widget(CharacterSelection(name='character_selection'))
         sm.add_widget(CharacterScreen(name='character_screen'))
         sm.add_widget(GameScreen(name='game'))
-        sm.add_widget(GameOverScreen(name='game_over'))
+        sm.add_widget(GameOverScreen(name='game_over'))  # หน้าจอ Game Over
         return sm
+
 
 if __name__ == '__main__':
     MyGameApp().run()
