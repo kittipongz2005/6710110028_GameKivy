@@ -104,12 +104,6 @@ class GameOverScreen(Screen):
         self.add_widget(self.game_over_label)
 
 
-        retry_button = Button(text="เล่นใหม่", size_hint=(None, None), size=(200, 50),
-                          font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
-                          pos_hint={'center_x': 0.5, 'center_y': 0.4})
-        retry_button.bind(on_press=self.retry_game)
-        self.add_widget(retry_button)
-
         quit_button = Button(text="ออกจากเกม", size_hint=(None, None), size=(200, 50),
                          font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                          pos_hint={'center_x': 0.5, 'center_y': 0.2})
@@ -122,15 +116,31 @@ class GameOverScreen(Screen):
                              size_hint=(None, None), size=(400, 100), 
                              pos_hint={'center_x': 0.5, 'center_y': 0.55})
         self.add_widget(self.score_label)
+        self.new_record_label = Label(
+            text="", font_size=30, color=(1, 0, 0, 1),
+            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+            size_hint=(None, None), size=(400, 50),
+            pos_hint={'center_x': 0.5, 'center_y': 0.45}
+        )
+        self.add_widget(self.new_record_label)
 
     def on_enter(self):
 
         game_screen = self.manager.get_screen('game')
         self.score_label.text = f"คะแนนของคุณ: {game_screen.game_widget.score}\nคะแนนสูงสุด: {game_screen.game_widget.high_score}"
+        if game_screen.game_widget.score > game_screen.game_widget.high_score:
+            self.new_record_label.text = "New Record!"
+        else:
+            self.new_record_label.text = ""
+
+
+        
 
     def retry_game(self, instance):
-        self.manager.get_screen('game').reset_game()
-        self.manager.get_screen('game').set_hero_image(self.manager.get_screen('game').selected_character)
+        game_screen = self.manager.get_screen('game')
+        game_screen.reset_game()  # รีเซ็ตเกมใหม่ทั้งหมด
+        game_screen.game_widget.score = 0  # รีเซ็ตคะแนนเป็น 0
+        game_screen.game_widget.update_score_label()  # อัปเดตแสดงคะแนนใหม่
         self.manager.current = 'game'
 
     def quit_game(self, instance):
@@ -172,11 +182,12 @@ class GameWidget(Widget):
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
             pos=(20, Window.height - 100),
             size_hint=(None, None),
-            font_size=30,  # ปรับขนาดให้ใหญ่ขึ้น
+            font_size=30,  
             font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf"
         )
 
         self.add_widget(self.score_label)
+    
 
         self.sound = SoundLoader.load('test.mp3')
         if self.sound:
@@ -270,6 +281,10 @@ class GameWidget(Widget):
             asteroid = Rectangle(pos=(x_pos, y_pos), size=(50, 50), texture=asteroid_image.texture)
             self.asteroids.append(asteroid)
 
+    def show_game_over(self):
+        self.game_over = True   
+        self.parent.manager.current = 'game_over'
+
     def update(self, dt):
         if self.game_over:
             return
@@ -303,14 +318,12 @@ class GameWidget(Widget):
                     self.update_score_label()
                     break
 
-
         for asteroid in self.asteroids:
             if self.check_collision(self.hero, asteroid):
-                self.game_over = True
-                self.manager.current = 'game_over'
+                self.show_game_over()
                 break
 
-        if self.score // 100 + 1 > self.level:
+        if self.score // 50 + 1 > self.level:
             self.level += 1
             self.update_speeds()
             self.update_score_label()
@@ -328,17 +341,9 @@ class GameWidget(Widget):
                 y1 < y2 + h2 and y1 + h1 > y2)
 
     def reset_game(self):
-        self.canvas.clear()
-        with self.canvas:
-            self.hero = Rectangle(pos=(Window.width / 2, 50), size=(100, 100))
-            self.bullets = []
-            self.asteroids = []
+        pass
+        
 
-        self.score = 0
-        self.level = 1
-        self.game_over = False
-        self.update_speeds()
-        self.update_score_label()
 
 class MyGameApp(App):
     def build(self):
@@ -347,9 +352,8 @@ class MyGameApp(App):
         sm.add_widget(CharacterSelection(name='character_selection'))
         sm.add_widget(CharacterScreen(name='character_screen'))
         sm.add_widget(GameScreen(name='game'))
-        sm.add_widget(GameOverScreen(name='game_over'))  # หน้าจอ Game Over
+        sm.add_widget(GameOverScreen(name='game_over'))
         return sm
-
 
 if __name__ == '__main__':
     MyGameApp().run()
