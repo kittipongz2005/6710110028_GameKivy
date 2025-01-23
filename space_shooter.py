@@ -16,13 +16,11 @@ class MainMenu(Screen):
         background = Image(source='C:/Users/Asus/Desktop/รูป/5.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
         game_title = Label(text="Space Adventure Game", font_size=100, color=(1, 1, 0, 1), 
-                        font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                         size_hint=(None, None), size=(600, 150), 
                         pos_hint={'center_x': 0.5, 'center_y': 0.7})  # ปรับค่า center_y ลงมา
         self.add_widget(game_title)
 
-        start_button = Button(text="เริ่มเกม", size_hint=(None, None), size=(200, 50), 
-                          font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+        start_button = Button(text="Start the game", size_hint=(None, None), size=(200, 50), 
                           pos_hint={'center_x': 0.5, 'center_y': 0.2})
         start_button.bind(on_press=self.start_game)
         self.add_widget(start_button)
@@ -36,8 +34,7 @@ class CharacterSelection(Screen):
         background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        title_label = Label(text="เลือกตัวละคร", font_size=50, 
-                        font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+        title_label = Label(text="Select a spaceship", font_size=50, 
                         size_hint=(None, None), size=(300, 100), 
                         pos_hint={'center_x': 0.5, 'top': 1})
         self.add_widget(title_label)
@@ -50,8 +47,7 @@ class CharacterSelection(Screen):
         ]
 
         for i in range(4):
-            character_button = Button(text=f"ตัวละคร {i+1}", size_hint=(None, None), size=(200, 50), 
-                                  font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+            character_button = Button(text=f"spaceship {i+1}", size_hint=(None, None), size=(200, 50), 
                                   pos_hint={'center_x': 0.5, 'center_y': 0.6 - i * 0.1})
             character_button.bind(on_press=lambda instance, i=i: self.select_character(i))
             self.add_widget(character_button)
@@ -70,14 +66,12 @@ class CharacterScreen(Screen):
                                    pos_hint={'center_x': 0.5, 'center_y': 0.6})
         self.add_widget(self.character_image)
 
-        start_button = Button(text="เริ่ม", size_hint=(None, None), size=(150, 50),
-                          font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+        start_button = Button(text="Start", size_hint=(None, None), size=(150, 50),
                           pos_hint={'x': 0.85, 'y': 0})
         start_button.bind(on_press=self.start_game)
         self.add_widget(start_button)
 
-        back_button = Button(text="ย้อนกลับ", size_hint=(None, None), size=(150, 50),
-                         font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+        back_button = Button(text="Go Back", size_hint=(None, None), size=(150, 50),
                          pos_hint={'x': 0.05, 'y': 0})
         back_button.bind(on_press=self.go_back)
         self.add_widget(back_button)
@@ -98,27 +92,23 @@ class GameOverScreen(Screen):
         self.add_widget(background)
 
         self.game_over_label = Label(text="Game Over!", font_size=50, color=(1, 0, 0, 1),
-                                 font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                                  size_hint=(None, None), size=(400, 100), 
                                  pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.add_widget(self.game_over_label)
 
 
-        quit_button = Button(text="ออกจากเกม", size_hint=(None, None), size=(200, 50),
-                         font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
+        quit_button = Button(text="Exit the game", size_hint=(None, None), size=(200, 50),
                          pos_hint={'center_x': 0.5, 'center_y': 0.2})
         quit_button.bind(on_press=self.quit_game)
         self.add_widget(quit_button)
 
 
         self.score_label = Label(text="", font_size=30, 
-                             font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
                              size_hint=(None, None), size=(400, 100), 
                              pos_hint={'center_x': 0.5, 'center_y': 0.55})
         self.add_widget(self.score_label)
         self.new_record_label = Label(
             text="", font_size=30, color=(1, 0, 0, 1),
-            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf",
             size_hint=(None, None), size=(400, 50),
             pos_hint={'center_x': 0.5, 'center_y': 0.45}
         )
@@ -127,7 +117,7 @@ class GameOverScreen(Screen):
     def on_enter(self):
 
         game_screen = self.manager.get_screen('game')
-        self.score_label.text = f"คะแนนของคุณ: {game_screen.game_widget.score}\nคะแนนสูงสุด: {game_screen.game_widget.high_score}"
+        self.score_label.text = f"Your Score: {game_screen.game_widget.score}\nHight Score: {game_screen.game_widget.high_score}"
         if game_screen.game_widget.score > game_screen.game_widget.high_score:
             self.new_record_label.text = "New Record!"
         else:
@@ -182,8 +172,7 @@ class GameWidget(Widget):
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
             pos=(20, Window.height - 100),
             size_hint=(None, None),
-            font_size=30,  
-            font_name="C:/Users/Asus/Downloads/file-11-21-55-OQtwta/THSarabun.ttf"
+            font_size=30
         )
 
         self.add_widget(self.score_label)
