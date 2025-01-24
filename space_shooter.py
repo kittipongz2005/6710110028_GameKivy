@@ -13,14 +13,20 @@ from kivy.uix.label import Label
 class MainMenu(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/5.jpg', allow_stretch=True, keep_ratio=False)
+        
+        background = Image(source='C:/Users/Asus/Desktop/รูป/21.jpg', allow_stretch=False, keep_ratio=True)
         self.add_widget(background)
-        game_title = Label(text="Space Adventure Game", font_size=100, color=(1, 1, 0, 1), 
-                        size_hint=(None, None), size=(600, 150), 
-                        pos_hint={'center_x': 0.5, 'center_y': 0.7})  # ปรับค่า center_y ลงมา
-        self.add_widget(game_title)
+    
+        start_label = Label(
+            text="Space Shooter",
+            size_hint=(None, None),
+            color=(0.5, 0.5, 0.5, 1),  
+            pos_hint={'center_x': 0.5, 'top': 0.95},  
+            font_size='100sp'  
+        )
+        self.add_widget(start_label)
 
-        start_button = Button(text="Start the game", size_hint=(None, None), size=(200, 50), 
+        start_button = Button(text="Start the game", size_hint=(0.2, 0.1), size=(200, 50), 
                           pos_hint={'center_x': 0.5, 'center_y': 0.2})
         start_button.bind(on_press=self.start_game)
         self.add_widget(start_button)
@@ -31,12 +37,12 @@ class MainMenu(Screen):
 class CharacterSelection(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/26.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        title_label = Label(text="Select a spaceship", font_size=50, 
-                        size_hint=(None, None), size=(300, 100), 
-                        pos_hint={'center_x': 0.5, 'top': 1})
+        title_label = Label(text="Select a spaceship", font_size=80, 
+                        size_hint=(0.2, 0.1), size=(400, 200), 
+                        pos_hint={'center_x': 0.5, 'top': 0.90})
         self.add_widget(title_label)
 
         self.character_images = [
@@ -48,7 +54,7 @@ class CharacterSelection(Screen):
 
         for i in range(4):
             character_button = Button(text=f"spaceship {i+1}", size_hint=(None, None), size=(200, 50), 
-                                  pos_hint={'center_x': 0.5, 'center_y': 0.6 - i * 0.1})
+                                  pos_hint={'center_x': 0.5, 'center_y': 0.63 - i * 0.1})
             character_button.bind(on_press=lambda instance, i=i: self.select_character(i))
             self.add_widget(character_button)
 
@@ -59,11 +65,11 @@ class CharacterSelection(Screen):
 class CharacterScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/28.webp', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
-        self.character_image = Image(size_hint=(None, None), size=(200, 200), 
-                                   pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        self.character_image = Image(size_hint=(None, None), size=(400, 400), 
+                                   pos_hint={'center_x': 0.5, 'center_y': 0.3})
         self.add_widget(self.character_image)
 
         start_button = Button(text="Start", size_hint=(None, None), size=(150, 50),
@@ -72,7 +78,7 @@ class CharacterScreen(Screen):
         self.add_widget(start_button)
 
         back_button = Button(text="Go Back", size_hint=(None, None), size=(150, 50),
-                         pos_hint={'x': 0.05, 'y': 0})
+                         pos_hint={'x': 0, 'y': 0})
         back_button.bind(on_press=self.go_back)
         self.add_widget(back_button)
 
@@ -139,7 +145,7 @@ class GameOverScreen(Screen):
 class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/12.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='C:/Users/Asus/Desktop/รูป/18.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
         self.game_widget = GameWidget()
         self.add_widget(self.game_widget)
