@@ -153,6 +153,7 @@ class GameScreen(Screen):
     def on_enter(self):
         self.game_widget.set_hero_image(self.selected_character)
         Clock.schedule_once(self.start_asteroids, 1.0)
+        
 
     def start_asteroids(self, dt):
         self.game_widget.start_asteroid_creation()
@@ -173,10 +174,11 @@ class GameWidget(Widget):
         self.score = 0
         self.level = 1
         self.high_score = self.load_high_score()
+        self.bullet_count = 30
         
         self.score_label = Label(
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
-            pos=(20, Window.height - 100),
+            pos=(50, Window.height - 120),
             size_hint=(None, None),
             font_size=30
         )
@@ -230,6 +232,8 @@ class GameWidget(Widget):
 
     def start_asteroid_creation(self):
         Clock.schedule_interval(self.create_asteroid, max(1.0 - (self.level * 0.1), 0.3))
+        Clock.schedule_interval(self.create_ammo_powerup, 10.0)  # เรียกทุก 10 วินาที
+
 
     def _on_keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_key_down)
@@ -261,12 +265,32 @@ class GameWidget(Widget):
         self.hero.pos = (cur_x, cur_y)
 
     def shoot_bullet(self):
+        if self.bullet_count > 0:  # ตรวจสอบว่ามีกระสุนเหลือหรือไม่
+            with self.canvas:
+                bullet_image = Image(source='C:/Users/Asus/Desktop/รูป/8.png', size=(10, 20))
+                bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, 
+                                    self.hero.pos[1] + self.hero.size[1]), 
+                                size=(10, 20), texture=bullet_image.texture)
+                self.bullets.append(bullet)
+            self.bullet_count -= 1  # ลดจำนวนกระสุน
+            self.update_score_label()  # อัปเดตแสดงผลกระสุน
+        else:
+            print("No bullets left!")  # แสดงข้อความเมื่อไม่มีลูกกระสุน
+
+                
+    def update_score_label(self):
+        self.score_label.text = (f'Score: {self.score}\nHigh Score: {self.high_score}\n'
+                             f'Level: {self.level}\nBullets: {self.bullet_count}')
+
+
+    def create_ammo_powerup(self, dt):
         with self.canvas:
-            bullet_image = Image(source='C:/Users/Asus/Desktop/รูป/8.png', size=(10, 20))
-            bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, 
-                                  self.hero.pos[1] + self.hero.size[1]), 
-                             size=(10, 20), texture=bullet_image.texture)
-            self.bullets.append(bullet)
+            x_pos = random.randint(0, Window.width - 30)
+            y_pos = Window.height
+            ammo_image = Image(source='C:/Users/Asus/Desktop/รูป/ammo.png', size=(30, 30))
+            ammo_powerup = Rectangle(pos=(x_pos, y_pos), size=(30, 30), texture=ammo_image.texture)
+            self.asteroids.append(ammo_powerup)
+
 
     def create_asteroid(self, dt):
         with self.canvas:
@@ -295,6 +319,10 @@ class GameWidget(Widget):
 
         for asteroid in self.asteroids:
             asteroid.pos = (asteroid.pos[0], asteroid.pos[1] - self.asteroid_speed)
+            if self.check_collision(self.hero, asteroid):
+                if asteroid.size == (30, 30):  # กรณีเป็นไอเท็มเพิ่มกระสุน
+                    self.bullet_count += 10  # เพิ่มกระสุน
+                    self.update_score_label()  # อัปเดตแสดงผลจำนวนกระสุน
             if asteroid.pos[1] < 0:
                 self.canvas.remove(asteroid)
                 self.asteroids.remove(asteroid)
@@ -324,7 +352,9 @@ class GameWidget(Widget):
             self.update_score_label()
 
     def update_score_label(self):
-        self.score_label.text = f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}'
+        self.score_label.text = (f'Score: {self.score}\nHigh Score: {self.high_score}\n'
+                         f'Level: {self.level}\nBullets: {self.bullet_count}')
+
 
     def check_collision(self, obj1, obj2):
         x1, y1 = obj1.pos
