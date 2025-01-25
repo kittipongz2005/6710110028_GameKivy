@@ -70,24 +70,54 @@ class CharacterScreen(Screen):
         self.add_widget(background)
 
         self.character_image = Image(size_hint=(None, None), size=(400, 400), 
-                                   pos_hint={'center_x': 0.5, 'center_y': 0.3})
+                                   pos_hint={'center_x': 0.5, 'center_y': 0.5})
         self.add_widget(self.character_image)
 
-        start_button = Button(text="Start", size_hint=(None, None), size=(150, 50),
-                          pos_hint={'x': 0.85, 'y': 0})
-        start_button.bind(on_press=self.start_game)
-        self.add_widget(start_button)
+        # Bullet types selection
+        self.bullet_types = [
+            'C:/Users/Asus/Desktop/รูป/32.png',
+            'C:/Users/Asus/Desktop/รูป/31.png', 
+            'C:/Users/Asus/Desktop/รูป/30.png',
+            'C:/Users/Asus/Desktop/รูป/29.png'
+        ]
+        
+        self.selected_bullet = None
+        
+        # Bullet selection buttons
+        for i in range(4):
+            bullet_button = Button(text=f"Bullet {i+1}", size_hint=(None, None), size=(100, 50), 
+                                   pos=(50 + i*120, 50))
+            bullet_button.bind(on_press=lambda instance, i=i: self.select_bullet(i))
+            self.add_widget(bullet_button)
+
+        # Start button (initially disabled)
+        self.start_button = Button(text="Start", size_hint=(None, None), size=(150, 50),
+                                   pos_hint={'x': 0.85, 'y': 0}, disabled=True)
+        self.start_button.bind(on_press=self.start_game)
+        self.add_widget(self.start_button)
 
         back_button = Button(text="Go Back", size_hint=(None, None), size=(150, 50),
-                         pos_hint={'x': 0, 'y': 0})
+                             pos_hint={'x': 0, 'y': 0})
         back_button.bind(on_press=self.go_back)
         self.add_widget(back_button)
 
     def on_enter(self):
+        # Reset selection when screen is entered
         self.character_image.source = self.manager.get_screen('game').selected_character
+        self.selected_bullet = None
+        self.start_button.disabled = True
+
+    def select_bullet(self, bullet_id):
+        # Store selected bullet and enable start button
+        self.selected_bullet = self.bullet_types[bullet_id]
+        self.start_button.disabled = False
 
     def start_game(self, instance):
-        self.manager.current = 'game'
+        # เริ่มเกมได้เมื่อเลือกทั้งยานและกระสุน
+        if self.selected_bullet:
+            game_screen = self.manager.get_screen('game')
+            game_screen.selected_bullet = self.selected_bullet  # ส่งต่อรูปภาพกระสุนที่เลือก
+            self.manager.current = 'game'
 
     def go_back(self, instance):
         self.manager.current = 'character_selection'
@@ -146,6 +176,7 @@ class GameOverScreen(Screen):
 class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.selected_bullet = None
         background = Image(source='C:/Users/Asus/Desktop/รูป/18.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
         self.game_widget = GameWidget()
@@ -153,6 +184,7 @@ class GameScreen(Screen):
 
     def on_enter(self):
         self.game_widget.set_hero_image(self.selected_character)
+        self.game_widget.selected_bullet = self.selected_bullet  # ส่งค่า selected_bullet ไปยัง GameWidget
         Clock.schedule_once(self.start_asteroids, 1.0)
         
 
@@ -176,9 +208,9 @@ class GameWidget(Widget):
         self.level = 1
         self.high_score = self.load_high_score()
         self.bullet_count = 100
-        self.earth_health = 100 
+        self.earth_health = 50 
 
-        self.health_bar = ProgressBar(max=100, value=self.earth_health, size_hint=(0.6, None), height=30 , size=(800, 50))
+        self.health_bar = ProgressBar(max=50, value=self.earth_health, size_hint=(0.6, None), height=30 , size=(800, 50))
         self.health_bar.pos = (Window.width * 0.1, 5)
         self.add_widget(self.health_bar)
 
@@ -249,7 +281,7 @@ class GameWidget(Widget):
         self._keyboard = None
 
     def _on_key_down(self, keyboard, keycode, text, modifiers):
-        if text == 'i' and not self.game_over:
+        if text == 'i' and not self.game_over:  # ตรวจสอบว่ากดปุ่ม 'i' และเกมไม่จบ
             self.shoot_bullet()
         self.pressed_keys.add(text)
 
@@ -273,18 +305,23 @@ class GameWidget(Widget):
         self.hero.pos = (cur_x, cur_y)
 
     def shoot_bullet(self):
-        if self.bullet_count > 0:  # ตรวจสอบว่ามีกระสุนเหลือหรือไม่
+        print("Shooting bullet!")  # แสดงข้อความเมื่อยิงกระสุน
+        if self.bullet_count > 0:
             with self.canvas:
-                bullet_image = Image(source='C:/Users/Asus/Desktop/รูป/8.png', size=(10, 20))
-                bullet = Rectangle(pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, 
-                                    self.hero.pos[1] + self.hero.size[1]), 
-                                size=(10, 20), texture=bullet_image.texture)
-                self.bullets.append(bullet)
-            self.bullet_count -= 1  # ลดจำนวนกระสุน
-            self.update_score_label()  # อัปเดตแสดงผลกระสุน
+                if hasattr(self, 'selected_bullet') and self.selected_bullet:
+                    print(f"Using bullet: {self.selected_bullet}")  # แสดงเส้นทางรูปภาพกระสุน
+                    bullet_image = Image(source=self.selected_bullet, size=(10, 20))
+                    bullet = Rectangle(
+                        pos=(self.hero.pos[0] + self.hero.size[0] / 2 - 5, 
+                            self.hero.pos[1] + self.hero.size[1]), 
+                        size=(10, 20), 
+                        texture=bullet_image.texture
+                    )
+                    self.bullets.append(bullet)
+            self.bullet_count -= 1
+            self.update_score_label()
         else:
             print("No bullets left!")  # แสดงข้อความเมื่อไม่มีลูกกระสุน
-
                 
     def update_score_label(self):
         self.score_label.text = (f'Score: {self.score}\nHigh Score: {self.high_score}\n'
@@ -322,7 +359,7 @@ class GameWidget(Widget):
         # อัปเดตการเคลื่อนที่ของ bullets
         for bullet in self.bullets:
             bullet.pos = (bullet.pos[0], bullet.pos[1] + self.bullet_speed)
-            if bullet.pos[1] > Window.height:
+            if bullet.pos[1] > Window.height:  # หากกระสุนหลุดจอ
                 self.canvas.remove(bullet)
                 self.bullets.remove(bullet)
 
@@ -362,7 +399,7 @@ class GameWidget(Widget):
             powerup.pos = (powerup.pos[0], powerup.pos[1] - self.asteroid_speed)
 
             if self.check_collision(self.hero, powerup):
-                self.bullet_count += 30 
+                self.bullet_count += 100 
                 self.update_score_label()
                 self.canvas.remove(powerup)
                 self.ammo_powerups.remove(powerup)
@@ -375,6 +412,10 @@ class GameWidget(Widget):
             if self.check_collision(self.hero, asteroid):
                 self.show_game_over()
                 break
+
+            if self.earth_health <= 0:
+               self.show_game_over()
+               break
 
         # เพิ่มระดับความยาก
         if self.score // 50 + 1 > self.level:
@@ -397,7 +438,12 @@ class GameWidget(Widget):
                 y1 < y2 + h2 and y1 + h1 > y2)
 
     def reset_game(self):
-        pass
+        self.score = 0
+        self.level = 1
+        self.bullet_count = 100
+        self.earth_health = 50
+        self.game_over = False
+        self.update_score_label()
         
 
 
