@@ -174,7 +174,7 @@ class GameWidget(Widget):
         self.score = 0
         self.level = 1
         self.high_score = self.load_high_score()
-        self.bullet_count = 30
+        self.bullet_count = 100
         
         self.score_label = Label(
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
@@ -200,6 +200,7 @@ class GameWidget(Widget):
             self.hero = Rectangle(pos=(Window.width / 2, 50), size=(100, 100))
             self.bullets = []
             self.asteroids = []
+            self.ammo_powerups = []
 
         self.base_hero_speed = 500
         self.base_bullet_speed = 10
@@ -289,7 +290,8 @@ class GameWidget(Widget):
             y_pos = Window.height
             ammo_image = Image(source='C:/Users/Asus/Desktop/รูป/ammo.png', size=(30, 30))
             ammo_powerup = Rectangle(pos=(x_pos, y_pos), size=(30, 30), texture=ammo_image.texture)
-            self.asteroids.append(ammo_powerup)
+            self.ammo_powerups.append(ammo_powerup)  # เพิ่มไปยัง self.ammo_powerups
+
 
 
     def create_asteroid(self, dt):
@@ -310,23 +312,28 @@ class GameWidget(Widget):
 
         self.move_step(dt)
 
-     
+        # อัปเดตการเคลื่อนที่ของ bullets
         for bullet in self.bullets:
             bullet.pos = (bullet.pos[0], bullet.pos[1] + self.bullet_speed)
             if bullet.pos[1] > Window.height:
                 self.canvas.remove(bullet)
                 self.bullets.remove(bullet)
 
+        # อัปเดตการเคลื่อนที่ของ asteroids
         for asteroid in self.asteroids:
             asteroid.pos = (asteroid.pos[0], asteroid.pos[1] - self.asteroid_speed)
-            if self.check_collision(self.hero, asteroid):
-                if asteroid.size == (30, 30):  # กรณีเป็นไอเท็มเพิ่มกระสุน
-                    self.bullet_count += 10  # เพิ่มกระสุน
-                    self.update_score_label()  # อัปเดตแสดงผลจำนวนกระสุน
             if asteroid.pos[1] < 0:
                 self.canvas.remove(asteroid)
                 self.asteroids.remove(asteroid)
 
+        # อัปเดตการเคลื่อนที่ของ ammo_powerups
+        for ammo in self.ammo_powerups:
+            ammo.pos = (ammo.pos[0], ammo.pos[1] - self.asteroid_speed)
+            if ammo.pos[1] < 0:
+                self.canvas.remove(ammo)
+                self.ammo_powerups.remove(ammo)
+
+        # ตรวจสอบการชนของ bullets และ asteroids
         for bullet in self.bullets:
             for asteroid in self.asteroids:
                 if self.check_collision(bullet, asteroid):
@@ -341,11 +348,26 @@ class GameWidget(Widget):
                     self.update_score_label()
                     break
 
+        # ตรวจสอบการชนของ hero กับ ammo_powerups
+        for powerup in self.ammo_powerups:
+            powerup.pos = (powerup.pos[0], powerup.pos[1] - self.asteroid_speed)
+
+            if self.check_collision(self.hero, powerup):
+                self.bullet_count += 30  # เพิ่มกระสุน 10 นัด
+                self.update_score_label()
+                self.canvas.remove(powerup)
+                self.ammo_powerups.remove(powerup)
+
+            elif powerup.pos[1] < 0:  # หากกระสุนหลุดจอ
+                self.canvas.remove(powerup)
+                self.ammo_powerups.remove(powerup)
+        # ตรวจสอบการชนของ hero กับ asteroids
         for asteroid in self.asteroids:
             if self.check_collision(self.hero, asteroid):
                 self.show_game_over()
                 break
 
+        # เพิ่มระดับความยาก
         if self.score // 50 + 1 > self.level:
             self.level += 1
             self.update_speeds()
