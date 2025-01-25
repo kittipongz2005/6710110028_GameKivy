@@ -85,8 +85,11 @@ class CharacterScreen(Screen):
         
         # Bullet selection buttons
         for i in range(4):
-            bullet_button = Button(text=f"Bullet {i+1}", size_hint=(None, None), size=(100, 50), 
-                                   pos=(50 + i*120, 50))
+            bullet_button = Button(
+                text=f"Bullet {i+1}", 
+                size_hint=(None, None), 
+                size=(100, 50), 
+                pos_hint={'x': 0.05, 'y': 0.7 - i * 0.15} )
             bullet_button.bind(on_press=lambda instance, i=i: self.select_bullet(i))
             self.add_widget(bullet_button)
 
