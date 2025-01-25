@@ -17,6 +17,10 @@ class MainMenu(Screen):
         
         background = Image(source='C:/Users/Asus/Desktop/รูป/21.jpg', allow_stretch=False, keep_ratio=True)
         self.add_widget(background)
+        self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\41.mp3')  # โหลดเสียงพื้นหลัง
+        if self.background_music:
+            self.background_music.loop = True  # ให้เสียงเล่นวนลูป
+            self.background_music.play()
     
         start_label = Label(
             text="Space Shooter",
@@ -35,11 +39,13 @@ class MainMenu(Screen):
     def start_game(self, instance):
         self.manager.current = 'character_selection'
 
+
 class CharacterSelection(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         background = Image(source='C:/Users/Asus/Desktop/รูป/26.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
+
 
         title_label = Label(text="Select a spaceship", font_size=80, 
                         size_hint=(0.2, 0.1), size=(400, 200), 
@@ -62,7 +68,7 @@ class CharacterSelection(Screen):
     def select_character(self, character_id):
         self.manager.get_screen('game').selected_character = self.character_images[character_id]
         self.manager.current = 'character_screen'
-
+    
 class CharacterScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -132,6 +138,12 @@ class CharacterScreen(Screen):
 
     def go_back(self, instance):
         self.manager.current = 'character_selection'
+    
+    def on_leaves(self):
+        # หยุดเสียงพื้นหลังเมื่อออกจากหน้าจอนี้ (ถ้าต้องการ)
+        if self.background_music:
+            self.background_music.stop()
+
 
 class GameOverScreen(Screen):
     def __init__(self, **kwargs):
