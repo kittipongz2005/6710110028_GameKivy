@@ -47,10 +47,10 @@ class CharacterSelection(Screen):
         self.add_widget(title_label)
 
         self.character_images = [
-            'C:/Users/Asus/Desktop/รูป/1.png',
-            'C:/Users/Asus/Desktop/รูป/2.png',
-            'C:/Users/Asus/Desktop/รูป/3.png',
-            'C:/Users/Asus/Desktop/รูป/4.png'
+            'C:/Users/Asus/Desktop/รูป/33.png',
+            'C:/Users/Asus/Desktop/รูป/34.png',
+            'C:/Users/Asus/Desktop/รูป/35.png',
+            'C:/Users/Asus/Desktop/รูป/36.png'
         ]
 
         for i in range(4):
