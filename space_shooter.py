@@ -9,6 +9,7 @@ from kivy.clock import Clock
 import random
 from kivy.core.audio import SoundLoader
 from kivy.uix.label import Label
+from kivy.uix.progressbar import ProgressBar
 
 class MainMenu(Screen):
     def __init__(self, **kwargs):
@@ -175,6 +176,12 @@ class GameWidget(Widget):
         self.level = 1
         self.high_score = self.load_high_score()
         self.bullet_count = 100
+        self.earth_health = 100 
+
+        self.health_bar = ProgressBar(max=100, value=self.earth_health, size_hint=(0.6, None), height=30 , size=(800, 50))
+        self.health_bar.pos = (Window.width * 0.1, 5)
+        self.add_widget(self.health_bar)
+
         
         self.score_label = Label(
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
@@ -322,7 +329,9 @@ class GameWidget(Widget):
         # อัปเดตการเคลื่อนที่ของ asteroids
         for asteroid in self.asteroids:
             asteroid.pos = (asteroid.pos[0], asteroid.pos[1] - self.asteroid_speed)
-            if asteroid.pos[1] < 0:
+            if asteroid.pos[1] < 0:  # หากหลุดจอ
+                self.earth_health -= 1  # ลดเลือดของโลก
+                self.health_bar.value = self.earth_health  # อัปเดตหลอดเลือด
                 self.canvas.remove(asteroid)
                 self.asteroids.remove(asteroid)
 
@@ -353,7 +362,7 @@ class GameWidget(Widget):
             powerup.pos = (powerup.pos[0], powerup.pos[1] - self.asteroid_speed)
 
             if self.check_collision(self.hero, powerup):
-                self.bullet_count += 30  # เพิ่มกระสุน 10 นัด
+                self.bullet_count += 30 
                 self.update_score_label()
                 self.canvas.remove(powerup)
                 self.ammo_powerups.remove(powerup)
