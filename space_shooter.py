@@ -80,16 +80,24 @@ class CharacterScreen(Screen):
             'C:/Users/Asus/Desktop/รูป/30.png',
             'C:/Users/Asus/Desktop/รูป/29.png'
         ]
+        self.bullet_2 = [
+            'C:/Users/Asus/Desktop/รูป/37.png',
+            'C:/Users/Asus/Desktop/รูป/38.png',
+            'C:/Users/Asus/Desktop/รูป/39.png',
+            'C:/Users/Asus/Desktop/รูป/40.png'
+        ]
         
         self.selected_bullet = None
         
         # Bullet selection buttons
         for i in range(4):
             bullet_button = Button(
-                text=f"Bullet {i+1}", 
-                size_hint=(None, None), 
-                size=(100, 50), 
-                pos_hint={'x': 0.05, 'y': 0.7 - i * 0.15} )
+                text=f"                          select", 
+                size_hint=(0.15, 0.2), 
+                color=(1, 0, 0, 1),
+                size=(50, 100), 
+                background_normal=self.bullet_types[i],
+                pos_hint={'x': 0.7, 'y': 0.7 - i * 0.15} )
             bullet_button.bind(on_press=lambda instance, i=i: self.select_bullet(i))
             self.add_widget(bullet_button)
 
