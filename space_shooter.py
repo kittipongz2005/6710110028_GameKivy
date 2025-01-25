@@ -92,7 +92,7 @@ class CharacterScreen(Screen):
         # Bullet selection buttons
         for i in range(4):
             bullet_button = Button(
-                text=f"                          select", 
+                text=f"                select", 
                 size_hint=(0.15, 0.2), 
                 color=(1, 0, 0, 1),
                 size=(50, 100), 
@@ -228,7 +228,7 @@ class GameWidget(Widget):
         
         self.score_label = Label(
             text=f'Score: {self.score}\nHigh Score: {self.high_score}\nLevel: {self.level}',
-            pos=(50, Window.height - 120),
+            pos=(60, Window.height - 120),
             size_hint=(None, None),
             font_size=30
         )
@@ -410,7 +410,7 @@ class GameWidget(Widget):
             powerup.pos = (powerup.pos[0], powerup.pos[1] - self.asteroid_speed)
 
             if self.check_collision(self.hero, powerup):
-                self.bullet_count += 100 
+                self.bullet_count += 50 
                 self.update_score_label()
                 self.canvas.remove(powerup)
                 self.ammo_powerups.remove(powerup)
