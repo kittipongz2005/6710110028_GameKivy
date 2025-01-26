@@ -227,11 +227,18 @@ class GameScreen(Screen):
         self.add_widget(background)
         self.game_widget = GameWidget()
         self.add_widget(self.game_widget)
+        self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\45.mp3')  # โหลดเสียงพื้นหลัง
+        if self.background_music:
+            self.background_music.loop = True  # ให้เสียงเล่นวนลูป
+            
+
 
     def on_enter(self):
         self.game_widget.set_hero_image(self.selected_character)
         self.game_widget.selected_bullet = self.selected_bullet  # ส่งค่า selected_bullet ไปยัง GameWidget
         Clock.schedule_once(self.start_asteroids, 1.0)
+        if self.background_music:
+            self.background_music.play()
         
 
     def start_asteroids(self, dt):
@@ -239,7 +246,9 @@ class GameScreen(Screen):
 
     def on_leave(self):
         self.game_widget.reset_game()
-
+        if self.background_music:
+            self.background_music.stop()
+        
     def set_hero_image(self, image_path):
         self.game_widget.set_hero_image(image_path)
 
@@ -259,6 +268,7 @@ class GameWidget(Widget):
         self.health_bar = ProgressBar(max=50, value=self.earth_health, size_hint=(0.6, None), height=30 , size=(800, 50))
         self.health_bar.pos = (Window.width * 0.1, 5)
         self.add_widget(self.health_bar)
+        
 
         
         self.score_label = Label(
