@@ -39,12 +39,20 @@ class MainMenu(Screen):
     def start_game(self, instance):
         self.manager.current = 'character_selection'
 
+    def on_leave(self):
+        if self.background_music:
+            self.background_music.stop()
+
 
 class CharacterSelection(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         background = Image(source='C:/Users/Asus/Desktop/รูป/26.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
+        self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\41.mp3')  # โหลดเสียงพื้นหลัง
+        if self.background_music:
+            self.background_music.loop = True  # ให้เสียงเล่นวนลูป
+            self.background_music.play()
 
 
         title_label = Label(text="Select a spaceship", font_size=80, 
@@ -68,12 +76,25 @@ class CharacterSelection(Screen):
     def select_character(self, character_id):
         self.manager.get_screen('game').selected_character = self.character_images[character_id]
         self.manager.current = 'character_screen'
+
+    def on_enter(self):
+        # เล่นเสียงพื้นหลังเมื่อเข้าสู่หน้าจอนี้
+        if self.background_music:
+            self.background_music.play()
+
+    def on_leave(self):
+        if self.background_music:
+            self.background_music.stop()
     
 class CharacterScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         background = Image(source='C:/Users/Asus/Desktop/รูป/28.webp', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
+        self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\42.mp3')  # โหลดเสียงพื้นหลัง
+        if self.background_music:
+            self.background_music.loop = True  # ให้เสียงเล่นวนลูป
+            self.background_music.play()
 
         self.character_image = Image(size_hint=(None, None), size=(400, 400), 
                                    pos_hint={'center_x': 0.5, 'center_y': 0.5})
@@ -123,6 +144,8 @@ class CharacterScreen(Screen):
         self.character_image.source = self.manager.get_screen('game').selected_character
         self.selected_bullet = None
         self.start_button.disabled = True
+        if self.background_music:
+            self.background_music.play()
 
     def select_bullet(self, bullet_id):
         # Store selected bullet and enable start button
@@ -130,20 +153,20 @@ class CharacterScreen(Screen):
         self.start_button.disabled = False
 
     def start_game(self, instance):
-        # เริ่มเกมได้เมื่อเลือกทั้งยานและกระสุน
+    # เริ่มเกมได้เมื่อเลือกทั้งยานและกระสุน
         if self.selected_bullet:
+            if self.background_music:
+                self.background_music.stop()  # หยุดเสียงพื้นหลังเมื่อเปลี่ยนหน้า
             game_screen = self.manager.get_screen('game')
             game_screen.selected_bullet = self.selected_bullet  # ส่งต่อรูปภาพกระสุนที่เลือก
-            self.manager.current = 'game'
+            self.manager.current = 'game'  # เปลี่ยนไปยังหน้าเล่นเกม
 
     def go_back(self, instance):
         self.manager.current = 'character_selection'
     
-    def on_leaves(self):
-        # หยุดเสียงพื้นหลังเมื่อออกจากหน้าจอนี้ (ถ้าต้องการ)
+    def on_leave(self):
         if self.background_music:
             self.background_music.stop()
-
 
 class GameOverScreen(Screen):
     def __init__(self, **kwargs):
