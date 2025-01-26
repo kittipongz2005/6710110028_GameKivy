@@ -378,7 +378,7 @@ class GameWidget(Widget):
         with self.canvas:
             x_pos = random.randint(0, Window.width - 30)
             y_pos = Window.height
-            ammo_image = Image(source='C:/Users/Asus/Desktop/รูป/ammo.png', size=(30, 30))
+            ammo_image = Image(source='C:/Users/Asus/Desktop/รูป/44.png', size=(30, 30))
             ammo_powerup = Rectangle(pos=(x_pos, y_pos), size=(30, 30), texture=ammo_image.texture)
             self.ammo_powerups.append(ammo_powerup)  # เพิ่มไปยัง self.ammo_powerups
 
