@@ -15,9 +15,9 @@ class MainMenu(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        background = Image(source='C:/Users/Asus/Desktop/รูป/21.jpg', allow_stretch=False, keep_ratio=True)
+        background = Image(source='21.jpg', allow_stretch=False, keep_ratio=True)
         self.add_widget(background)
-        self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\41.mp3')  # โหลดเสียงพื้นหลัง
+        self.background_music = SoundLoader.load(r'41.mp3')  # โหลดเสียงพื้นหลัง
         if self.background_music:
             self.background_music.loop = True  # ให้เสียงเล่นวนลูป
             self.background_music.play()
@@ -47,7 +47,7 @@ class MainMenu(Screen):
 class CharacterSelection(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/26.png', allow_stretch=True, keep_ratio=False)
+        background = Image(source='26.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
         self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\41.mp3')  # โหลดเสียงพื้นหลัง
         if self.background_music:
@@ -61,10 +61,10 @@ class CharacterSelection(Screen):
         self.add_widget(title_label)
 
         self.character_images = [
-            'C:/Users/Asus/Desktop/รูป/33.png',
-            'C:/Users/Asus/Desktop/รูป/34.png',
-            'C:/Users/Asus/Desktop/รูป/35.png',
-            'C:/Users/Asus/Desktop/รูป/36.png'
+            '33.png',
+            '34.png',
+            '35.png',
+            '36.png'
         ]
 
         for i in range(4):
@@ -89,9 +89,9 @@ class CharacterSelection(Screen):
 class CharacterScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/28.webp', allow_stretch=True, keep_ratio=False)
+        background = Image(source='28.webp', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
-        self.background_music = SoundLoader.load(r'C:\Users\Asus\Desktop\รูป\42.mp3')  # โหลดเสียงพื้นหลัง
+        self.background_music = SoundLoader.load('42.mp3')  # โหลดเสียงพื้นหลัง
         if self.background_music:
             self.background_music.loop = True  # ให้เสียงเล่นวนลูป
             self.background_music.play()
@@ -102,16 +102,16 @@ class CharacterScreen(Screen):
 
         # Bullet types selection
         self.bullet_types = [
-            'C:/Users/Asus/Desktop/รูป/32.png',
-            'C:/Users/Asus/Desktop/รูป/31.png', 
-            'C:/Users/Asus/Desktop/รูป/30.png',
-            'C:/Users/Asus/Desktop/รูป/29.png'
+            '32.png',
+            '31.png', 
+            '30.png',
+            '29.png'
         ]
         self.bullet_2 = [
-            'C:/Users/Asus/Desktop/รูป/37.png',
-            'C:/Users/Asus/Desktop/รูป/38.png',
-            'C:/Users/Asus/Desktop/รูป/39.png',
-            'C:/Users/Asus/Desktop/รูป/40.png'
+            '37.png',
+            '38.png',
+            '39.png',
+            '40.png'
         ]
         
         self.selected_bullet = None
@@ -171,7 +171,7 @@ class CharacterScreen(Screen):
 class GameOverScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        background = Image(source='C:/Users/Asus/Desktop/รูป/6.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='6.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
 
         self.game_over_label = Label(text="Game Over!", font_size=50, color=(1, 0, 0, 1),
@@ -223,7 +223,7 @@ class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.selected_bullet = None
-        background = Image(source='C:/Users/Asus/Desktop/รูป/18.jpg', allow_stretch=True, keep_ratio=False)
+        background = Image(source='18.jpg', allow_stretch=True, keep_ratio=False)
         self.add_widget(background)
         self.game_widget = GameWidget()
         self.add_widget(self.game_widget)
@@ -388,7 +388,7 @@ class GameWidget(Widget):
         with self.canvas:
             x_pos = random.randint(0, Window.width - 30)
             y_pos = Window.height
-            ammo_image = Image(source='C:/Users/Asus/Desktop/รูป/44.png', size=(30, 30))
+            ammo_image = Image(source='44.png', size=(30, 30))
             ammo_powerup = Rectangle(pos=(x_pos, y_pos), size=(30, 30), texture=ammo_image.texture)
             self.ammo_powerups.append(ammo_powerup)  # เพิ่มไปยัง self.ammo_powerups
 
@@ -398,7 +398,7 @@ class GameWidget(Widget):
         with self.canvas:
             x_pos = random.randint(0, Window.width - 50)
             y_pos = Window.height
-            asteroid_image = Image(source='C:/Users/Asus/Desktop/รูป/9.png', size=(50, 50))
+            asteroid_image = Image(source='9.png', size=(50, 50))
             asteroid = Rectangle(pos=(x_pos, y_pos), size=(50, 50), texture=asteroid_image.texture)
             self.asteroids.append(asteroid)
 
